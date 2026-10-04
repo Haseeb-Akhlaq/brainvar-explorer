@@ -190,3 +190,15 @@ assumed.
 The suite was also mutation-tested: three defects were introduced deliberately
 to check the tests noticed. Two were caught; the third exposed a real gap in the
 fixtures, which is documented in [FINDINGS.md](FINDINGS.md#8-the-test-suite-and-proof-that-it-can-fail).
+
+---
+
+## Mobile app underway
+
+A mobile app is under development, to make the explorer more accessible: a
+gene's trajectory from a phone, not only from a desk. The sign-in screen is the
+first piece in place, and the code is in [`mobile/`](mobile/).
+
+<p align="center">
+  <img src="docs/mobile-login.png" alt="The mobile app's sign-in screen on a phone" width="300">
+</p>
