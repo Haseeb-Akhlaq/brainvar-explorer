@@ -28,20 +28,25 @@ in **~26 ms**.
 
 ---
 
-## Run it
+## Run it locally
 
-One command, from a clean checkout:
-
-```bash
-docker compose -f docker-compose.local.yml up -d --build
-```
-
-Then load the dataset (the three raw files are not in version control — the
-matrix alone is 94 MB):
+Needs Docker, and the three BrainVar data files, which are not in the repo.
 
 ```bash
+# 1. Clone
+git clone https://github.com/Haseeb-Akhlaq/brainvar-explorer.git
+cd brainvar-explorer
+
+# 2. Configure, and put the data files in place
+cp backend/.env.example backend/.env
 mkdir -p data && cp -r /path/to/brainvar-files data/brainvar
+
+# 3. Start the stack
+docker compose -f docker-compose.local.yml up -d --build --wait
+
+# 4. Load the dataset and create a user to sign in with
 docker compose -f docker-compose.local.yml exec backend python manage.py load_brainvar
+docker compose -f docker-compose.local.yml exec backend python manage.py createsuperuser
 ```
 
 | | |
@@ -54,8 +59,8 @@ docker compose -f docker-compose.local.yml exec backend python manage.py load_br
 Tests:
 
 ```bash
-docker compose -f docker-compose.local.yml exec backend python manage.py test   # 119
-cd frontend && npm test                                                          # 18
+docker compose -f docker-compose.local.yml exec backend python manage.py test
+docker compose -f docker-compose.local.yml exec frontend npm test
 ```
 
 Deployment to EC2 is documented in [DEPLOYMENT.md](DEPLOYMENT.md).
