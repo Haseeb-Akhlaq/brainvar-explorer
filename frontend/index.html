@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Trace any gene's expression across human brain development — BrainVar RNA-seq, LOESS-smoothed." />
+    <title>BrainVar Trajectory Explorer</title>
+    <!-- Start the data downloads before the JS bundle executes -->
+    <link rel="preload" href="%BASE_URL%data/gene-index.json" as="fetch" crossorigin />
+    <link rel="preload" href="%BASE_URL%data/meta.json" as="fetch" crossorigin />
+    <!-- The trajectory mark on its blue tile, as the login page shows it.
+         16-64px frames. -->
+    <link rel="icon" href="%BASE_URL%favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..700&family=Spline+Sans+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

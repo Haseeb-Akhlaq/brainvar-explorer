@@ -1,0 +1,30 @@
+# Web
+Django==6.1.1
+djangorestframework==3.18.0
+django-cors-headers==4.9.0
+# OpenAPI 3 schema + the interactive Swagger UI at /api/docs/.
+# The sidecar bundles the Swagger UI and ReDoc assets so the page does not
+# depend on a third-party CDN (drf-spectacular defaults to jsdelivr @latest,
+# which is both a network dependency and an unpinned one).
+drf-spectacular==0.30.0
+drf-spectacular-sidecar==2026.9.1
+python-dotenv==1.2.3
+
+# Field-level audit trail for model changes (users, groups). Pinned to 3.4.1:
+# the wheel still advertises Django 5.2 as its ceiling, but 6.1 was verified
+# here — migrations apply and create/update/delete diffs are recorded.
+# Auth and data-access events are not model writes, so they are recorded
+# separately by the `activity` app.
+django-auditlog==3.4.1
+
+# WSGI server (production)
+gunicorn==23.0.0
+
+# PostgreSQL driver
+psycopg[binary]==3.3.5
+
+# Numerics — the LOESS fit in brainvar/loess.py.
+# scikit-misc (the library the original script uses) publishes no
+# linux/aarch64 wheels, so the fit is implemented on numpy instead and
+# verified against skmisc-generated fixtures. See brainvar/loess.py.
+numpy==2.5.2

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your BrainVar Trajectory Explorer account</title>
+</head>
+<!--
+    Tables and inline styles throughout, deliberately. Mail clients strip
+    <style> blocks and support almost no modern CSS, so this is the layout
+    language that actually survives Outlook and Gmail.
+-->
+<body style="margin: 0; padding: 0; background-color: #f9fafb; font-family: 'Segoe UI', Arial, Helvetica, sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f9fafb; padding: 40px 16px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border: 1px solid #e4e7ec; border-radius: 16px; overflow: hidden;">
+
+                    <!-- Logo. The lockup is drawn on white, so it sits on a
+                         white panel. -->
+                    <tr>
+                        <td style="padding: 36px 40px 24px 40px; text-align: center;">
+                            <img src="cid:{{ logo_cid }}" alt="BrainVar Trajectory Explorer" width="180" style="width: 180px; max-width: 100%; height: auto; display: block; margin: 0 auto;">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 0 40px 8px 40px; text-align: center;">
+                            <h1 style="margin: 0 0 10px 0; color: #101828; font-size: 22px; font-weight: 600;">Welcome, {{ user_name }}</h1>
+                            <p style="margin: 0; color: #667085; font-size: 15px; line-height: 1.6;">
+                                An account has been created for you on the BrainVar Trajectory Explorer,
+                                which plots gene expression across human brain development.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Credentials -->
+                    <tr>
+                        <td style="padding: 28px 40px 0 40px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f9fafb; border: 1px solid #e4e7ec; border-radius: 12px;">
+                                <tr>
+                                    <td style="padding: 22px;">
+                                        <p style="margin: 0 0 6px 0; color: #667085; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Email address</p>
+                                        <p style="margin: 0 0 18px 0; color: #101828; font-size: 15px; font-weight: 500;">{{ user_email }}</p>
+
+                                        <p style="margin: 0 0 6px 0; color: #667085; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Temporary password</p>
+                                        <p style="margin: 0; color: #3641f5; font-size: 19px; font-weight: 700; font-family: 'Courier New', Courier, monospace; letter-spacing: 0.06em;">{{ password }}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- Bulletproof-ish button: a padded table cell rather than
+                         a styled <a>, which Outlook renders unreliably. -->
+                    <tr>
+                        <td style="padding: 26px 40px 0 40px;" align="center">
+                            <table role="presentation" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="background-color: #465fff; border-radius: 8px;">
+                                        <a href="{{ login_url }}" style="display: inline-block; padding: 13px 30px; color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none;">Sign in</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="margin: 14px 0 0 0; color: #98a2b3; font-size: 12px; word-break: break-all;">{{ login_url }}</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 26px 40px 0 40px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fffaeb; border: 1px solid #fedf89; border-radius: 10px;">
+                                <tr>
+                                    <td style="padding: 14px 18px;">
+                                        <p style="margin: 0; color: #b54708; font-size: 13px; line-height: 1.6;">
+                                            This password was generated for you and sent by email. Please
+                                            change it after signing in, and do not forward this message.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 26px 40px 34px 40px; border-top: 1px solid #e4e7ec;">
+                            <p style="margin: 22px 0 0 0; color: #98a2b3; font-size: 12px; line-height: 1.6; text-align: center;">
+                                This is an automated message — replies are not monitored.
+                                For help, contact <a href="mailto:{{ support_email }}" style="color: #3641f5; text-decoration: none;">{{ support_email }}</a>.
+                            </p>
+                            <p style="margin: 10px 0 0 0; color: #98a2b3; font-size: 12px; text-align: center;">
+                                BrainVar Trajectory Explorer &middot; {{ year }}
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

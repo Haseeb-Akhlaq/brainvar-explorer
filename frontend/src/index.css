@@ -1,0 +1,2568 @@
+/* ---------------------------------------------------------------------------
+   BrainVar Trajectory Explorer — design tokens & styles
+
+   The palette and type follow the same system as FLOW (TailAdmin): Outfit
+   throughout, a neutral gray ramp, and a single brand blue for interactive
+   chrome. Written as custom properties rather than utility classes because
+   this app has no Tailwind — the tokens are the shared layer, not the build.
+
+   The chart's data colours are deliberately NOT on that ramp. They were
+   chosen for separability against the plot surface and carry meaning, so they
+   keep their hues and are re-checked for contrast whenever the surface moves.
+--------------------------------------------------------------------------- */
+
+:root,
+:root[data-theme="dark"] {
+  /* Neutral ramp — TailAdmin gray. */
+  --bg: #101828;          /* gray-900, the page */
+  --surface: #171f2e;     /* white 3% over the page, as FLOW's cards */
+  --surface-2: #1d2939;   /* gray-800, elevated: table headers, inputs */
+  --ink: #f2f4f7;         /* gray-100 */
+  --ink-2: #d0d5dd;       /* gray-300 */
+  --ink-3: #98a2b3;       /* gray-400, ≥4.5:1 on bg and both surfaces */
+  --hairline: #1d2939;    /* gray-800 */
+  --hairline-strong: #344054; /* gray-700, for a border that must be seen */
+
+  /* Brand — lifted one step in dark so it stays legible on a dark ground. */
+  --brand: #7592ff;        /* brand-400 */
+  --brand-strong: #9cb9ff; /* brand-300, hover */
+  --brand-solid: #465fff;  /* brand-500, filled buttons keep the true brand */
+  --brand-soft: rgb(70 95 255 / 18%);
+  --accent: #7592ff;       /* retained name: used by existing links */
+
+  /* Status */
+  --success: #6ce9a6;      /* success-300 */
+  --success-soft: rgb(18 183 106 / 16%);
+  --danger: #fda29b;       /* error-300 */
+  --danger-solid: #d92d20; /* error-600; white text on it is 4.83:1 */
+  --danger-soft: rgb(240 68 56 / 16%);
+  --status-ok: #6ce9a6;
+
+  /* Chart-only tokens, read from CSS so the SVG follows the theme. The two
+     series keep the hues validated against the plot surface. */
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --chart-grid: #1d2939;
+  --chart-baseline: #344054;
+  --chart-birth: #98a2b3;
+  --chart-prenatal: #7592ff;
+
+  --focus-ring: rgb(117 146 255 / 28%);
+  --glow-1: rgb(70 95 255 / 10%);
+  --glow-2: rgb(117 146 255 / 6%);
+  --scrim: rgb(12 17 29 / 70%);
+  --shadow: rgb(0 0 0 / 45%);
+
+  /* Outfit for everything but data. The mono is kept for gene symbols,
+     Braincodes and identifiers, where character-by-character reading and
+     column alignment matter more than matching the body face. */
+  --font-display: Outfit, system-ui, -apple-system, sans-serif;
+  --font-body: Outfit, system-ui, -apple-system, sans-serif;
+  --font-mono: "Spline Sans Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  color-scheme: dark;
+}
+
+/*
+ * Light theme, which is FLOW's default: gray-50 page, white cards, gray-200
+ * hairlines. Applied by [data-theme="light"] on <html>.
+ */
+:root[data-theme="light"] {
+  --bg: #f9fafb;          /* gray-50 */
+  --surface: #ffffff;
+  --surface-2: #f2f4f7;   /* gray-100 */
+  --ink: #101828;         /* gray-900 */
+  --ink-2: #344054;       /* gray-700 */
+  --ink-3: #667085;       /* gray-500, ≥4.5:1 on bg and both surfaces */
+  --hairline: #e4e7ec;    /* gray-200 */
+  --hairline-strong: #d0d5dd; /* gray-300 */
+
+  /* One step darker than TailAdmin's own text shades: these read on white
+     AND on their matching soft pill background, where brand-500 (4.34:1) and
+     error-600 (4.44:1) both fall just short of 4.5:1. */
+  --brand: #3641f5;        /* brand-600 */
+  --brand-strong: #2a31d8; /* brand-700, hover */
+  --brand-solid: #465fff;  /* brand-500; filled buttons, white text 4.84:1 */
+  --brand-soft: #ecf3ff;   /* brand-50 */
+  --accent: #3641f5;
+
+  --success: #027a48;      /* success-700 */
+  --success-soft: #ecfdf3; /* success-50 */
+  --danger: #b42318;       /* error-700 */
+  --danger-solid: #d92d20; /* error-600; white text on it is 4.83:1 */
+  --danger-soft: #fef3f2;  /* error-50 */
+  --status-ok: #027a48;
+
+  --series-1: #1f63b8;
+  --series-2: #b2431a;
+  --chart-grid: #e4e7ec;
+  --chart-baseline: #d0d5dd;
+  --chart-birth: #667085;
+  --chart-prenatal: #465fff;
+
+  --focus-ring: rgb(70 95 255 / 20%);
+  --glow-1: rgb(70 95 255 / 5%);
+  --glow-2: rgb(70 95 255 / 3%);
+  --scrim: rgb(16 24 40 / 45%);
+  --shadow: rgb(16 24 40 / 12%);
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Keep the scrollbar from changing layout width (ResizeObserver feedback) */
+html {
+  scrollbar-gutter: stable;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  --page-gutter: 28px;
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--page-gutter) 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* Ambient glow behind the content — barely-there depth, not decoration */
+.bg-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(52% 38% at 28% 4%, var(--glow-1), transparent 70%),
+    radial-gradient(40% 30% at 82% 90%, var(--glow-2), transparent 70%);
+  z-index: 0;
+}
+
+main,
+.footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Above main so the search dropdown overlays chips and tiles */
+.topbar {
+  position: relative;
+  z-index: 10;
+}
+
+/* --------------------------------- top bar ------------------------------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 0 18px;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19px;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand-mark {
+  align-self: center;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--brand-strong), var(--brand-solid) 70%);
+  box-shadow: 0 0 12px var(--brand);
+}
+
+.brand-sub {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
+}
+
+/* The link cluster. One row here; the mobile block below turns .topbar-links
+   into a drawer and reveals .topbar-menu. */
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.topbar-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-menu {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 9px;
+  cursor: pointer;
+  flex: none;
+}
+
+.topbar-menu:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+.topbar-menu:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --------------------------------- search -------------------------------- */
+
+.search {
+  position: relative;
+  width: min(420px, 56vw);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 0 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search-box:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.search-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--ink-3);
+  flex: none;
+}
+
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--ink);
+  font: 500 14px var(--font-body);
+  padding: 11px 0;
+}
+
+.search-box input::placeholder {
+  color: var(--ink-3);
+}
+
+.search-kbd {
+  flex: none;
+  font: 500 11px var(--font-mono);
+  color: var(--ink-3);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  padding: 2px 6px;
+  background: var(--surface);
+}
+
+.search-results {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  box-shadow: 0 18px 50px var(--shadow);
+  z-index: 40;
+  overflow: hidden;
+}
+
+.search-row {
+  display: grid;
+  grid-template-columns: auto 1fr 52px;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.search-row.is-active {
+  background: var(--brand-soft);
+}
+
+.search-symbol {
+  font: 600 14px var(--font-mono);
+  color: var(--ink);
+}
+
+.search-name {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-meter {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.search-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--brand);
+  opacity: 0.85;
+}
+
+.search-none {
+  padding: 14px 12px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* ---------------------------------- hero ---------------------------------- */
+
+.hero {
+  position: relative;
+  padding: 9vh 0 40px;
+  max-width: 720px;
+}
+
+.eyebrow {
+  font: 600 11.5px var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 18px;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7.5vw, 5.2rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  margin: 0 0 22px;
+}
+
+.hero-sub {
+  font-size: 16.5px;
+  color: var(--ink-2);
+  max-width: 540px;
+  margin: 0 0 30px;
+}
+
+.hero-curve {
+  position: absolute;
+  right: -160px;
+  top: 6vh;
+  width: min(620px, 52vw);
+  height: auto;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ---------------------------------- chips --------------------------------- */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.chips-label {
+  font: 600 11.5px var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-right: 4px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--brand);
+  transform: translateY(-1px);
+}
+
+.chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.chip.is-current {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.chip-symbol {
+  font: 600 13px var(--font-mono);
+}
+
+.chip-hint {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.chips-compact .chip {
+  padding: 5px 11px;
+}
+
+.chips-compact .chip-symbol {
+  font-size: 12px;
+}
+
+/* -------------------------------- gene head ------------------------------- */
+
+.gene-head {
+  padding: 26px 0 6px;
+}
+
+.gene-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.gene-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1;
+  margin: 0 0 8px;
+}
+
+.gene-sub {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-bottom: 4px;
+}
+
+.gene-name {
+  color: var(--ink-2);
+  font-size: 14.5px;
+}
+
+.gene-id {
+  font: 500 12.5px var(--font-mono);
+  color: var(--ink-3);
+  letter-spacing: 0.03em;
+}
+
+/* -------------------------------- stat tiles ------------------------------ */
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 18px 0 14px;
+}
+
+.stat-tile {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 14px 16px 12px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.stat-unit {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.stat-note {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 5px;
+}
+
+/* -------------------------------- chart card ------------------------------ */
+
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  padding: 18px 18px 10px;
+  overflow: hidden;
+}
+
+.chart-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 2px 6px 12px;
+}
+
+.chart-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.chart-meta {
+  font: 400 11.5px var(--font-mono);
+  color: var(--ink-3);
+  margin-top: 3px;
+  letter-spacing: 0.02em;
+}
+
+.chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.segmented {
+  display: inline-flex;
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.segmented button {
+  border: none;
+  background: none;
+  color: var(--ink-2);
+  font: 500 12.5px var(--font-body);
+  padding: 6px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.segmented button.is-on {
+  background: var(--brand-soft);
+  color: var(--ink);
+}
+
+.ghost-btn {
+  border: 1px solid var(--hairline);
+  background: none;
+  color: var(--ink-2);
+  font: 500 12.5px var(--font-body);
+  padding: 8px 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.ghost-btn:hover {
+  border-color: var(--brand);
+  color: var(--ink);
+}
+
+.legend {
+  display: flex;
+  gap: 18px;
+  padding: 0 6px 10px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.legend-key {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.legend-n {
+  color: var(--ink-3);
+  font: 400 11.5px var(--font-mono);
+}
+
+.chart-wrap {
+  position: relative;
+  transition: opacity 0.2s ease;
+}
+
+.chart-wrap.is-stale {
+  opacity: 0.45;
+}
+
+.chart-svg {
+  display: block;
+  border-radius: 10px;
+}
+
+.chart-svg:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.chart-skeleton {
+  height: 320px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-3);
+  font-size: 13.5px;
+}
+
+/* tooltip */
+.chart-tooltip {
+  position: absolute;
+  width: 216px;
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 11px 13px;
+  pointer-events: none;
+  box-shadow: 0 12px 34px var(--shadow);
+  z-index: 30;
+}
+
+.tt-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font: 600 12.5px var(--font-mono);
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.tt-muted {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+.tt-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.tt-value {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 7px;
+}
+
+.tt-unit {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.tt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--ink-3);
+  padding: 2.5px 0;
+}
+
+.tt-row strong {
+  color: var(--ink-2);
+  font-weight: 500;
+  text-align: right;
+}
+
+.tt-key {
+  display: inline-block;
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* -------------------------------- table view ------------------------------ */
+
+.table-section {
+  margin: 14px 0 0;
+}
+
+.table-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--ink-2);
+  font: 500 13px var(--font-body);
+  cursor: pointer;
+  padding: 8px 4px;
+}
+
+.table-toggle:hover {
+  color: var(--ink);
+}
+
+.table-chevron {
+  display: inline-block;
+  transition: transform 0.18s ease;
+  color: var(--ink-3);
+}
+
+.table-chevron.is-open {
+  transform: rotate(90deg);
+}
+
+.table-count {
+  font: 400 11.5px var(--font-mono);
+  color: var(--ink-3);
+}
+
+.table-scroll {
+  max-height: 340px;
+  overflow: auto;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.table-scroll th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  color: var(--ink-3);
+  font: 600 11px var(--font-mono);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 9px 14px;
+}
+
+.table-scroll td {
+  padding: 7px 14px;
+  border-top: 1px solid var(--hairline);
+  color: var(--ink-2);
+}
+
+.table-scroll td:first-child {
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+
+.table-scroll .num {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------ error & footer ---------------------------- */
+
+.error-card {
+  margin: 20px 0;
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+  border-radius: 14px;
+  padding: 14px 18px;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.footer {
+  margin-top: 34px;
+  border-top: 1px solid var(--hairline);
+  padding-top: 18px;
+}
+
+.footer p {
+  font-size: 12px;
+  color: var(--ink-3);
+  max-width: 760px;
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive
+
+   Four steps, each named for what actually stops fitting rather than for a
+   device:
+
+     980px  the seven top-bar items stop fitting beside the search field
+     860px  four stat tiles stop fitting
+     640px  the page is a phone: full-bleed cards, stacked controls
+     380px  the smallest phones still in use — trim type and padding
+--------------------------------------------------------------------------- */
+
+@media (max-width: 980px) {
+  /* Below this the bar becomes brand · search · theme · hamburger, and the
+     links move into the drawer. */
+  .topbar {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 16px 0 14px;
+  }
+
+  .brand {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .topbar-menu {
+    display: inline-flex;
+  }
+
+  .search {
+    order: 3;
+    flex: 1 0 100%;
+    width: 100%;
+  }
+
+  .topbar-links {
+    /* Anchored to .topbar (position: relative, z-index 10) so opening the
+       drawer overlays the page rather than shoving the hero down. */
+    position: absolute;
+    top: calc(100% - 4px);
+    right: 0;
+    left: 0;
+    z-index: 30;
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--hairline);
+    border-radius: 14px;
+    box-shadow: 0 18px 50px var(--shadow);
+  }
+
+  .topbar-links.is-open {
+    display: flex;
+  }
+
+  /* Every item in the drawer is a full-width row of the same height, so the
+     mix of links and buttons reads as one list. */
+  .topbar-links > a,
+  .topbar-links > button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: 15px;
+    text-align: left;
+    border: none;
+    border-radius: 9px;
+    background: none;
+  }
+
+  .topbar-links > a:hover,
+  .topbar-links > button:hover {
+    background: var(--brand-soft);
+    color: var(--ink);
+  }
+
+  .topbar-spacer {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .stat-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero-curve {
+    display: none;
+  }
+
+  .hero {
+    padding: 5vh 0 32px;
+  }
+}
+
+@media (max-width: 640px) {
+  .app {
+    --page-gutter: 16px;
+
+    padding-bottom: 32px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 12vw, 3.4rem);
+  }
+
+  .hero-sub {
+    font-size: 15.5px;
+  }
+
+  /* The hint doubles a chip's width, and six of them then run to four rows. */
+  .chip-hint {
+    display: none;
+  }
+
+  .chips-compact {
+    /* Horizontal strip rather than a wrapped block: the gene heading is what
+       matters at the top of the page, not the shortcuts under it. */
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    margin-inline: calc(-1 * var(--page-gutter));
+    padding-inline: var(--page-gutter);
+  }
+
+  .chips-compact::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chips-compact .chip {
+    flex: none;
+  }
+
+  .gene-title-row {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .gene-head {
+    padding: 18px 0 4px;
+  }
+
+  .stat-row {
+    gap: 8px;
+    margin: 14px 0 12px;
+  }
+
+  .stat-tile {
+    padding: 12px 12px 10px;
+  }
+
+  .stat-value {
+    font-size: 21px;
+  }
+
+  .chart-card {
+    padding: 12px 10px 6px;
+  }
+
+  .chart-head {
+    gap: 12px;
+    padding: 2px 2px 12px;
+  }
+
+  .chart-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .segmented button,
+  .ghost-btn {
+    white-space: nowrap;
+  }
+
+  .legend {
+    padding: 0 2px 10px;
+  }
+
+  .chart-tooltip {
+    padding: 9px 11px;
+  }
+
+  .tt-value {
+    font-size: 19px;
+  }
+
+  .table-scroll {
+    max-height: 300px;
+  }
+
+  .footer {
+    margin-top: 26px;
+  }
+}
+
+@media (max-width: 380px) {
+  .app {
+    --page-gutter: 12px;
+
+    padding-bottom: 28px;
+  }
+
+  .brand {
+    font-size: 17px;
+  }
+
+  /* Two lines of brand on a 320px screen pushes the controls off the row. */
+  .brand-sub {
+    display: none;
+  }
+
+  .stat-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .chart-card {
+    padding: 10px 6px 6px;
+  }
+
+  .chart-controls {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .segmented,
+  .ghost-btn {
+    flex: 1 1 auto;
+  }
+
+  .segmented {
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- theme toggle ---------- */
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 9px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.topbar-docs {
+  font-size: 0.88rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.topbar-docs:hover {
+  color: var(--ink);
+}
+
+/* ---------- authentication ---------- */
+
+.auth-splash {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--ink-3);
+  font-family: var(--font-body);
+  background: var(--bg);
+}
+
+.login {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 2rem 1.25rem;
+  background: var(--bg);
+  font-family: var(--font-body);
+}
+
+.login-toggle {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.5rem;
+}
+
+.login-card {
+  width: min(400px, 100%);
+  padding: 2.4rem 2.2rem;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+}
+
+/* The mark carries its own tile, so it needs no panel in either theme. */
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.login-logo svg {
+  display: block;
+  width: 56px;
+  height: 56px;
+}
+
+.login-card h1 {
+  /* Bottom margin carries the gap the subtitle used to provide. */
+  margin: 0 0 1.9rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.login-card form {
+  text-align: left;
+}
+
+.login-card label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.login-card input {
+  width: 100%;
+  margin-bottom: 1.1rem;
+  padding: 0.65rem 0.8rem;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--hairline);
+  border-radius: 9px;
+}
+
+.login-card input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.login-error {
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.86rem;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+  border-radius: 9px;
+}
+
+.login-submit {
+  width: 100%;
+  padding: 0.7rem;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--brand-solid);
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.login-submit:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.login-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 1.3rem 0;
+  color: var(--ink-3);
+  font-size: 0.78rem;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--hairline);
+}
+
+.login-sso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.68rem;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.login-sso:hover {
+  border-color: var(--ink-3);
+}
+
+.login-sso:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.login-note {
+  margin: 1.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.login-footer {
+  padding-top: 2rem;
+  font-size: 0.78rem;
+  color: var(--ink-3);
+}
+
+.topbar-signout {
+  padding: 0.35rem 0.7rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--ink-2);
+  background: none;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.topbar-signout:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+/* ---------------------------------------------------------------------------
+   Admin panel — FLOW's rhythm: 16px card radius, 48px table header, 24/16px
+   cell padding, 14px body text, 12px uppercase column labels.
+--------------------------------------------------------------------------- */
+
+.topbar-spacer {
+  /* The admin bar has no search field to absorb the middle, so a flexible
+     spacer keeps the controls against the right edge as on the explorer. */
+  flex: 1;
+}
+
+.topbar-admin {
+  padding: 0.4rem 0.75rem;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  text-decoration: none;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.topbar-admin:hover {
+  color: var(--ink);
+  border-color: var(--brand);
+}
+
+.admin {
+  margin-top: 8px;
+}
+
+/* ---- page header ---- */
+
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.page-head h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 38px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.page-head p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--ink-3);
+}
+
+/* ---- buttons ---- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.btn-primary {
+  color: #fff;
+  background: var(--brand-solid);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--brand-strong);
+}
+
+.btn-ghost {
+  color: var(--ink-2);
+  background: transparent;
+  border-color: var(--hairline-strong);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+
+.btn-outline {
+  color: var(--ink-2);
+  background: var(--surface);
+  border-color: var(--hairline-strong);
+}
+
+.btn-outline:hover:not(:disabled) {
+  color: var(--brand);
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+/* Sized to sit inside a table row without stretching it. */
+.btn-sm {
+  height: 32px;
+  padding: 0 11px;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.btn-danger {
+  color: #fff;
+  background: var(--danger-solid);
+}
+
+.btn-danger:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+/* ---- search ---- */
+
+.search-field {
+  position: relative;
+  max-width: 26rem;
+  margin-bottom: 18px;
+}
+
+.search-field svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-3);
+  pointer-events: none;
+}
+
+.search-field input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px 0 40px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-sm);
+}
+
+.search-field input::placeholder {
+  color: var(--ink-3);
+}
+
+.search-field input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* ---- card + table ---- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.card-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 64px 24px;
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
+.card-empty p {
+  margin: 0;
+}
+
+.data-table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  height: 48px;
+  padding: 0 24px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--hairline);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 16px 24px;
+  font-size: 14px;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--hairline);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover td {
+  background: var(--surface-2);
+}
+
+.data-table .muted {
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.col-actions {
+  text-align: right;
+}
+
+.cell-user {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cell-name {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.cell-email {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+/* ---- pills ---- */
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 20px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.pill-brand {
+  color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.pill-ok {
+  color: var(--success);
+  background: var(--success-soft);
+}
+
+.pill-muted {
+  color: var(--ink-3);
+  background: var(--surface-2);
+}
+
+.pill-warn {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* ---- row actions ---- */
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--ink-3);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.icon-btn:hover {
+  color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.icon-btn-danger:hover {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.icon-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* ---- active switch ---- */
+
+.switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  margin-right: 6px;
+  padding: 0;
+  background: var(--hairline-strong);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.switch[aria-checked="true"] {
+  background: var(--brand-solid);
+}
+
+.switch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.switch:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.15s;
+}
+
+.switch[aria-checked="true"] .switch-knob {
+  transform: translateX(16px);
+}
+
+.admin-note {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* ---- modals ---- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--scrim);
+}
+
+.modal-card {
+  width: 100%;
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px var(--shadow);
+}
+
+.modal-sm {
+  max-width: 26rem;
+}
+
+.modal-md {
+  max-width: 34rem;
+}
+
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 24px 0;
+}
+
+.modal-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.modal-head p {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+.modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  color: var(--ink-3);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 22px 24px;
+}
+
+.modal-body-centered {
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.modal-body-centered h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.modal-body-centered p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+.notice-card {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--success);
+  background: var(--success-soft);
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+  border-radius: var(--radius);
+}
+
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  color: var(--brand);
+  background: var(--brand-soft);
+  border-radius: 50%;
+}
+
+.modal-body-centered strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.danger-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-radius: 50%;
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 24px 24px;
+}
+
+/* ---- form fields ---- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.field > label,
+.field > legend {
+  padding: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.field > label span {
+  color: var(--danger);
+}
+
+.field input[type="email"],
+.field input[type="text"] {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-sm);
+}
+
+.field input::placeholder {
+  color: var(--ink-3);
+}
+
+.field input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.field input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.field-error {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--danger);
+}
+
+.field-hint {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.field-hint strong {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.field-hint-boxed {
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+}
+
+.group-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.group-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.group-option:has(input:checked) {
+  color: var(--brand);
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.group-option input {
+  accent-color: var(--brand-solid);
+}
+
+.form-banner {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ----------------------------- access denied ----------------------------- */
+
+.denied-card {
+  max-width: 32rem;
+  margin: 18vh auto 0;
+  padding: 30px 32px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.denied-card h1 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.denied-card p {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.denied-card code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  color: var(--ink);
+}
+
+.denied-back {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--brand);
+  text-decoration: none;
+}
+
+.denied-back:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------------------
+   Activity log
+
+   A list of events rather than a table: the rows are not homogeneous — a
+   sign-in has an address and nothing else, an account change carries a
+   field-by-field diff — so columns would be mostly empty.
+--------------------------------------------------------------------------- */
+
+.admin-tabs {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.admin-tab {
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-3);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+
+.admin-tab:hover {
+  color: var(--ink-2);
+}
+
+.admin-tab.is-active {
+  color: var(--brand);
+  border-bottom-color: var(--brand);
+}
+
+.activity-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.activity-filters .search-field {
+  flex: 1 1 16rem;
+  margin-bottom: 0;
+}
+
+.select-field {
+  height: 44px;
+  padding: 0 34px 0 12px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background-color: var(--surface);
+  /* Inline chevron so the control matches the inputs in both themes; the
+     native arrow cannot be recoloured. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%2398a2b3' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--radius-sm);
+  appearance: none;
+  cursor: pointer;
+}
+
+.select-field:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.activity-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity-item {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.activity-list li:last-child {
+  border-bottom: none;
+}
+
+.activity-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.activity-actor {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.activity-target {
+  font: 500 13px var(--font-mono);
+  color: var(--ink-2);
+  padding: 1px 8px;
+  background: var(--surface-2);
+  border-radius: 6px;
+  overflow-wrap: anywhere;
+}
+
+.activity-diff {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.activity-diff li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px;
+  padding: 2px 0;
+}
+
+.activity-field {
+  min-width: 8rem;
+  color: var(--ink-3);
+}
+
+.activity-old {
+  color: var(--ink-3);
+  text-decoration: line-through;
+}
+
+.activity-arrow {
+  color: var(--ink-3);
+}
+
+.activity-new {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.activity-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font: 400 12px var(--font-mono);
+  color: var(--ink-3);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.pager-status {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+@media (max-width: 640px) {
+  .admin-tabs {
+    /* Scrolls rather than wraps, so the strip stays one line. */
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: calc(-1 * var(--page-gutter));
+    padding-inline: var(--page-gutter);
+  }
+
+  .admin-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .activity-filters .search-field {
+    flex-basis: 100%;
+  }
+
+  .select-field {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .activity-item {
+    padding: 14px 16px;
+  }
+
+  .activity-field {
+    min-width: 100%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive, part two
+
+   Everything here overrides a rule declared above it — the admin table, the
+   modals, the login card, and the touch sizing — so it has to come last.
+--------------------------------------------------------------------------- */
+
+/* ---- admin table becomes a list of cards ---- */
+
+/*
+ * Six columns need ~930px. Rather than leave that behind a horizontal swipe —
+ * which put the entire Actions column off-screen on a phone — each row becomes
+ * a card. The markup is unchanged: the cells carry data-cell / data-label and
+ * this restyles them, so there is one table in the DOM and one source of truth
+ * for what a row contains.
+ */
+@media (max-width: 760px) {
+  .data-table-scroll {
+    overflow-x: visible;
+  }
+
+  .data-table,
+  .data-table tbody,
+  .data-table tr {
+    display: block;
+    width: 100%;
+  }
+
+  /* The header row has nowhere to go; data-label carries the same words down
+     into the cells that still need them. */
+  .data-table thead {
+    display: none;
+  }
+
+  .data-table tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    padding: 16px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .data-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .data-table tbody tr:hover td {
+    background: none;
+  }
+
+  .data-table td {
+    padding: 0;
+    border-bottom: none;
+  }
+
+  .data-table td[data-cell="user"] {
+    flex: 1 0 100%;
+  }
+
+  .data-table .cell-email {
+    /* Long addresses must wrap rather than widen the card. */
+    overflow-wrap: anywhere;
+  }
+
+  /* Groups and status share a line — they are both short pills. */
+  .data-table td[data-cell="groups"],
+  .data-table td[data-cell="status"] {
+    flex: 0 1 auto;
+  }
+
+  .data-table td[data-cell="date"] {
+    flex: 1 0 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+  }
+
+  .data-table td[data-cell="date"]::before {
+    content: attr(data-label);
+    color: var(--ink-3);
+  }
+
+  .data-table td[data-cell="actions"] {
+    flex: 1 0 100%;
+    margin-top: 2px;
+    padding-top: 12px;
+    border-top: 1px solid var(--hairline);
+    text-align: left;
+  }
+
+  .data-table .row-actions {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .page-head h1 {
+    font-size: 25px;
+    line-height: 32px;
+  }
+
+  .search-field {
+    max-width: none;
+  }
+}
+
+/* ---- modals ---- */
+
+@media (max-width: 560px) {
+  .modal-backdrop {
+    /* Bottom-anchored: the card sits above the thumb instead of behind the
+       keyboard when a field takes focus. */
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-card {
+    max-height: 92vh;
+    max-height: 92dvh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-bottom: none;
+  }
+
+  .modal-sm,
+  .modal-md {
+    max-width: none;
+  }
+
+  .modal-head {
+    padding: 20px 18px 0;
+  }
+
+  .modal-body {
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .modal-foot {
+    /* Full-width stacked buttons: two 42px targets side by side on a 320px
+       screen leave neither of them comfortably hittable. */
+    flex-direction: column-reverse;
+    padding: 0 18px 18px;
+  }
+
+  .modal-foot .btn {
+    width: 100%;
+  }
+
+  .group-picker .group-option {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+/* ---- login ---- */
+
+@media (max-width: 480px) {
+  .login {
+    padding: 1.5rem 1rem;
+  }
+
+  .login-toggle {
+    top: 0.75rem;
+    right: 0.9rem;
+  }
+
+  .login-card {
+    padding: 1.8rem 1.3rem;
+  }
+
+  .login-logo svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .login-card h1 {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .login-sso {
+    /* The label is long enough to need two lines at this width. */
+    text-align: left;
+    line-height: 1.35;
+  }
+
+  .denied-card {
+    margin-top: 12vh;
+    padding: 24px 20px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Touch input
+
+   Keyed on the pointer rather than the width: a small window on a desktop
+   still has a mouse, and these rules only pay for themselves on a finger.
+--------------------------------------------------------------------------- */
+
+@media (pointer: coarse) {
+  /* 44px is the smallest reliably tappable target. Applied as a min-height
+     with centred content so nothing has to be redrawn to gain it. */
+  .topbar-docs,
+  .topbar-admin,
+  .topbar-signout,
+  .theme-toggle,
+  .topbar-menu,
+  .table-toggle,
+  .icon-btn,
+  .modal-close,
+  .code-block-copy,
+  .docs-nav-toggle,
+  .docs-search-trigger {
+    min-height: 44px;
+  }
+
+  .topbar-docs,
+  .topbar-admin {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .theme-toggle,
+  .topbar-menu,
+  .icon-btn,
+  .modal-close {
+    min-width: 44px;
+  }
+
+  .segmented button {
+    min-height: 38px;
+  }
+
+  .ghost-btn,
+  .chip {
+    min-height: 40px;
+  }
+
+  .btn-sm {
+    height: 38px;
+  }
+
+  .switch {
+    /* The rail keeps its size; the padding around it is what grows. */
+    min-width: 44px;
+    min-height: 44px;
+    background: none;
+    border-radius: var(--radius-sm);
+  }
+
+  .switch::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 36px;
+    height: 20px;
+    transform: translate(-50%, -50%);
+    background: var(--hairline-strong);
+    border-radius: 999px;
+    transition: background-color 0.15s;
+  }
+
+  .switch[aria-checked="true"] {
+    background: none;
+  }
+
+  .switch[aria-checked="true"]::before {
+    background: var(--brand-solid);
+  }
+
+  .switch-knob {
+    top: 50%;
+    left: 50%;
+    transform: translate(-16px, -50%);
+  }
+
+  .switch[aria-checked="true"] .switch-knob {
+    transform: translate(0, -50%);
+  }
+}
+
+/* iOS Safari zooms the page when a field under 16px takes focus, and never
+   zooms back out. Only the rendered size needs to change. */
+@media (max-width: 980px) {
+  .search-box input,
+  .search-field input,
+  .field input[type="email"],
+  .field input[type="text"],
+  .login-card input,
+  .docs-search-box input,
+  .select-field {
+    font-size: 16px;
+  }
+}

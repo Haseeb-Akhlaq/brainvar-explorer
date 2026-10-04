@@ -1,0 +1,729 @@
+/*
+ * Documentation styles.
+ *
+ * Reuses the design tokens defined in index.css (--bg, --surface, --ink, …) so
+ * the docs and the explorer are visibly one application.
+ */
+
+.docs {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+.docs-loading,
+.docs-missing {
+  padding: 4rem 2rem;
+  color: var(--ink-2);
+  text-align: center;
+}
+
+/* ---------- top bar ---------- */
+
+.docs-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  /* Nothing in the bar may push past the viewport: the search trigger and the
+     theme toggle were being shoved off the right edge on a phone, which gave
+     the whole page a horizontal scroll. */
+  min-width: 0;
+  padding: 0.85rem 1.5rem;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.docs-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.docs-brand .brand-mark {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--series-1);
+}
+
+.docs-brand .brand-sub {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.docs-search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex: none;
+  padding: 0.4rem 0.7rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--ink-3);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.docs-search-trigger:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+.docs-search-trigger kbd,
+.docs-search-box kbd {
+  padding: 0.1rem 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  background: var(--surface-2);
+  border-radius: 4px;
+}
+
+.docs-app-link {
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.docs-app-link:hover {
+  text-decoration: underline;
+}
+
+.docs-nav-toggle {
+  display: none;
+  flex: none;
+  padding: 0.35rem;
+  color: var(--ink-2);
+  background: none;
+  border: 1px solid var(--hairline);
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+/* ---------- three-column body ---------- */
+
+.docs-body {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr) 220px;
+  gap: 2.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem;
+  align-items: start;
+}
+
+/* ---------- sidebar ---------- */
+
+.docs-sidebar {
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 7rem);
+  max-height: calc(100dvh - 7rem);
+  overflow-y: auto;
+}
+
+.docs-section + .docs-section {
+  margin-top: 1.6rem;
+}
+
+.docs-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.docs-sidebar ul {
+  margin: 0;
+  padding: 0 0 0 0.3rem;
+  list-style: none;
+  border-left: 1px solid var(--hairline);
+}
+
+.docs-link {
+  display: block;
+  padding: 0.32rem 0.7rem;
+  font-size: 0.9rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  margin-left: -1px;
+}
+
+.docs-link:hover {
+  color: var(--ink);
+}
+
+.docs-link.is-active {
+  color: var(--accent);
+  border-left-color: var(--series-1);
+  background: color-mix(in srgb, var(--series-1) 8%, transparent);
+}
+
+/* ---------- content ---------- */
+
+.docs-content-head h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  letter-spacing: -0.02em;
+}
+
+.docs-description {
+  margin: 0.5rem 0 0;
+  font-size: 1.02rem;
+  color: var(--ink-2);
+}
+
+.docs-updated {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--ink-3);
+}
+
+.docs-prose {
+  margin-top: 2rem;
+  font-size: 0.96rem;
+  line-height: 1.72;
+  color: var(--ink-2);
+}
+
+.docs-prose h2,
+.docs-prose h3 {
+  color: var(--ink);
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  /* Clear the sticky header when jumping to an anchor. */
+  scroll-margin-top: 5.5rem;
+}
+
+.docs-prose h2 {
+  margin: 2.6rem 0 0.9rem;
+  padding-top: 1.4rem;
+  font-size: 1.4rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.docs-prose h3 {
+  margin: 1.9rem 0 0.7rem;
+  font-size: 1.1rem;
+}
+
+.docs-prose a {
+  color: var(--accent);
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.docs-prose ul,
+.docs-prose ol {
+  padding-left: 1.3rem;
+}
+
+.docs-prose li {
+  margin: 0.35rem 0;
+}
+
+.docs-prose blockquote {
+  margin: 1.4rem 0;
+  padding: 0.1rem 1.1rem;
+  color: var(--ink-2);
+  border-left: 3px solid var(--series-1);
+  background: color-mix(in srgb, var(--series-1) 6%, transparent);
+}
+
+.docs-prose img {
+  max-width: 100%;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+}
+
+.inline-code {
+  padding: 0.12rem 0.36rem;
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--ink);
+  background: var(--surface-2);
+  border-radius: 5px;
+}
+
+/* ---------- tables ---------- */
+
+.table-scroll {
+  overflow-x: auto;
+  margin: 1.4rem 0;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+}
+
+.docs-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.89rem;
+}
+
+.docs-prose th,
+.docs-prose td {
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.docs-prose th {
+  color: var(--ink);
+  font-weight: 600;
+  background: var(--surface);
+  white-space: nowrap;
+}
+
+.docs-prose tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---------- code blocks ---------- */
+
+.code-block {
+  margin: 1.4rem 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+}
+
+.code-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.85rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.code-block-lang {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.code-block-copy {
+  padding: 0.2rem 0.55rem;
+  font: inherit;
+  font-size: 0.76rem;
+  color: var(--ink-3);
+  background: none;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.code-block-copy:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+.code-block-body {
+  margin: 0;
+  overflow-x: auto;
+  font-size: 0.85rem;
+}
+
+.code-block-body pre {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  /* Shiki sets its own background; the card supplies ours. */
+  background: transparent !important;
+}
+
+.code-block-plain {
+  padding: 0.9rem 1rem;
+  font-family: var(--font-mono);
+  color: var(--ink-2);
+}
+
+/* ---------- mermaid ---------- */
+
+.mermaid-diagram {
+  margin: 1.6rem 0;
+  padding: 1.2rem;
+  overflow-x: auto;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+}
+
+.mermaid-loading,
+.mermaid-error {
+  margin: 1.4rem 0;
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--ink-3);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+}
+
+/* ---------- previous / next ---------- */
+
+.docs-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 3.5rem;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.docs-pager-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.9rem 1.1rem;
+  text-decoration: none;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+}
+
+.docs-pager-link:hover {
+  border-color: var(--ink-3);
+}
+
+.docs-pager-link.is-next {
+  text-align: right;
+}
+
+.docs-pager-dir {
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.docs-pager-title {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.docs-pager-section {
+  font-size: 0.8rem;
+  color: var(--ink-3);
+}
+
+/* ---------- on this page ---------- */
+
+.docs-toc {
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 7rem);
+  max-height: calc(100dvh - 7rem);
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+
+.docs-toc-title {
+  margin-bottom: 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.docs-toc ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--hairline);
+}
+
+.docs-toc li.is-sub a {
+  padding-left: 1.5rem;
+  font-size: 0.82rem;
+}
+
+.docs-toc a {
+  display: block;
+  padding: 0.24rem 0.75rem;
+  color: var(--ink-3);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  margin-left: -1px;
+}
+
+.docs-toc a:hover {
+  color: var(--ink-2);
+}
+
+.docs-toc a.is-active {
+  color: var(--accent);
+  border-left-color: var(--series-1);
+}
+
+/* ---------- search ---------- */
+
+.docs-search-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  padding-top: 12vh;
+  background: var(--scrim);
+  backdrop-filter: blur(3px);
+}
+
+.docs-search-dialog {
+  width: min(600px, 92vw);
+  height: fit-content;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  box-shadow: 0 24px 60px var(--shadow);
+}
+
+.docs-search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.docs-search-box input {
+  flex: 1;
+  font: inherit;
+  font-size: 0.98rem;
+  color: var(--ink);
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.docs-search-results {
+  max-height: 55vh;
+  margin: 0;
+  padding: 0.4rem;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.docs-search-results button {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.docs-search-results button.is-active {
+  background: var(--surface-2);
+}
+
+.docs-search-section {
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.docs-search-title {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.docs-search-excerpt {
+  overflow: hidden;
+  font-size: 0.82rem;
+  color: var(--ink-3);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.docs-search-none {
+  padding: 1.2rem;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive
+
+     1150px  the "on this page" rail stops fitting
+      900px  the sidebar stops fitting — the hamburger takes over
+      600px  phone: the bar keeps only the brand, search and the toggle
+      420px  the search trigger drops to its icon
+--------------------------------------------------------------------------- */
+
+@media (max-width: 1150px) {
+  .docs-body {
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .docs-toc {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .docs-nav-toggle {
+    display: block;
+  }
+
+  .docs-body {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 1.5rem 1.25rem 4rem;
+  }
+
+  .docs-sidebar {
+    display: none;
+  }
+
+  /* The toggle turns the sidebar into a panel above the content. */
+  .docs-body.nav-open .docs-sidebar {
+    display: block;
+    position: static;
+    max-height: none;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .docs-app-link {
+    display: none;
+  }
+
+  .docs-pager {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .docs-pager-link.is-next {
+    text-align: left;
+  }
+}
+
+@media (max-width: 600px) {
+  .docs-topbar {
+    gap: 0.6rem;
+    padding: 0.7rem 1rem;
+  }
+
+  /* "Documentation" beside the wordmark is the first thing to give: the page
+     it is on already says what it is. */
+  .docs-brand .brand-sub {
+    display: none;
+  }
+
+  .docs-body {
+    padding: 1.25rem 1rem 3.5rem;
+  }
+
+  .docs-content-head h1 {
+    font-size: 1.7rem;
+  }
+
+  .docs-description {
+    font-size: 0.95rem;
+  }
+
+  .docs-prose {
+    margin-top: 1.5rem;
+    font-size: 0.94rem;
+  }
+
+  .docs-prose h2 {
+    margin: 2rem 0 0.7rem;
+    padding-top: 1.1rem;
+    font-size: 1.25rem;
+  }
+
+  .docs-prose h3 {
+    font-size: 1.05rem;
+  }
+
+  .docs-prose ul,
+  .docs-prose ol {
+    padding-left: 1.1rem;
+  }
+
+  /* Fenced code and diagrams keep their own width and scroll inside the card,
+     so a long line never widens the page. */
+  .code-block-body,
+  .mermaid-diagram,
+  .table-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mermaid-diagram {
+    padding: 0.9rem 0.7rem;
+  }
+
+  .docs-search-backdrop {
+    padding-top: 6vh;
+  }
+
+  .docs-search-dialog {
+    width: min(600px, 94vw);
+  }
+
+  .docs-search-results {
+    max-height: 60vh;
+    max-height: 60dvh;
+  }
+}
+
+@media (max-width: 420px) {
+  /* Icon only. The ⌘K hint is meaningless without a keyboard anyway. */
+  .docs-search-trigger span,
+  .docs-search-trigger kbd {
+    display: none;
+  }
+
+  .docs-search-trigger {
+    padding: 0.4rem;
+  }
+
+  .docs-brand {
+    font-size: 0.98rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-prose * {
+    scroll-behavior: auto;
+  }
+}

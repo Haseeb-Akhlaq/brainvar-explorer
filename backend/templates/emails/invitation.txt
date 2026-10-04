@@ -1,0 +1,21 @@
+{% autoescape off %}Welcome, {{ user_name }}
+
+An account has been created for you on the BrainVar Trajectory Explorer,
+which plots gene expression across human brain development.
+
+YOUR SIGN-IN DETAILS
+--------------------
+Email address:      {{ user_email }}
+Temporary password: {{ password }}
+
+Sign in: {{ login_url }}
+
+This password was generated for you and sent by email. Please change it
+after signing in, and do not forward this message.
+
+--
+This is an automated message - replies are not monitored.
+For help, contact {{ support_email }}.
+
+BrainVar Trajectory Explorer - {{ year }}
+{% endautoescape %}

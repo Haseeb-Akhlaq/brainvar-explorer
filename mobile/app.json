@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "BrainVar",
+    "slug": "brainvar-explorer",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/app-icon.png",
+    "scheme": "brainvar",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#101828",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.haseebakhlaq.brainvar"
+    },
+    "android": {
+      "package": "com.haseebakhlaq.brainvar",
+      "adaptiveIcon": {
+        "backgroundColor": "#465fff",
+        "foregroundImage": "./assets/images/adaptive-icon.png"
+      }
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 160,
+          "resizeMode": "contain",
+          "backgroundColor": "#101828"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": false
+    }
+  }
+}

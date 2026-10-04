@@ -1,0 +1,25 @@
+# Source data (98 MB CPM matrix — too large for git, and it is data, not source)
+/data
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+dist/
+
+# macOS
+.DS_Store
+
+# Word lock/temp files
+~$*
+
+# Local secrets
+.env
+
+# Production secrets and certificates
+.env.prod
+certbot/

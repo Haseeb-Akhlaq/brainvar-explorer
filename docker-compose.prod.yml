@@ -1,0 +1,146 @@
+# Production stack for a single EC2 host.
+#
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+#
+# Postgres runs in a container with a named volume (no RDS). Only nginx binds
+# to host ports; everything else is reachable only on the internal network.
+#
+# First deployment, in order:
+#   1. point brainvar.haseebakhlaq.com AND api.brainvar.haseebakhlaq.com
+#      at this host's public IP
+#   2. ./init-letsencrypt.sh          (issues the certificate)
+#   3. docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+#   4. copy the three source files to ./data/brainvar/
+#   5. docker compose -f docker-compose.prod.yml exec backend python manage.py load_brainvar
+
+# Own project name so volumes and networks never collide with the local stack.
+# Postgres only applies POSTGRES_PASSWORD when it initialises an empty volume,
+# so a shared volume would silently keep the other stack's credentials.
+name: brainvar-prod
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: brainvar_db_prod
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # No host port: the database is reachable only from the compose network.
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - brainvar_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: brainvar_backend_prod
+    # 3 workers suits a small EC2 instance; raise with (2 x cores) + 1.
+    command: >
+      gunicorn config.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers 3
+      --timeout 60
+      --access-logfile -
+      --error-logfile -
+    env_file:
+      - .env.prod
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - RUN_MIGRATIONS=true
+      - COLLECT_STATIC=true
+    volumes:
+      # nginx serves Django's static files from this shared volume.
+      - backend_static:/app/staticfiles
+      # The raw source files, read-only, for the one-off load command.
+      - ./data/brainvar:/data:ro
+    expose:
+      - "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      # Sends a Host header Django accepts, so ALLOWED_HOSTS does not have to
+      # be widened to 127.0.0.1 just to satisfy the probe.
+      test: ["CMD-SHELL", "curl -fs -H 'Host: api.brainvar.haseebakhlaq.com' http://127.0.0.1:8000/api/health/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - brainvar_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Baked into the bundle at build time — changing it needs a rebuild.
+        - VITE_API_URL=${VITE_API_URL}
+    container_name: brainvar_frontend_prod
+    expose:
+      - "80"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - brainvar_network
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: brainvar_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - backend_static:/app/staticfiles:ro
+    depends_on:
+      - backend
+      - frontend
+    # Reload every 6 hours so renewed certificates are picked up.
+    command: >
+      /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"
+    restart: unless-stopped
+    networks:
+      - brainvar_network
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: brainvar_certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    # Attempt renewal twice a day; certbot exits early if nothing is due.
+    entrypoint: >
+      /bin/sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h & wait $${!}; done"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  backend_static:
+
+networks:
+  brainvar_network:
+    driver: bridge
