@@ -17,6 +17,17 @@ in **~26 ms**.
 
 ---
 
+## Stack
+
+| | |
+|---|---|
+| **Backend** | ![Python 3.12](https://img.shields.io/badge/Python_3.12-3776AB?style=for-the-badge&logo=python&logoColor=white) ![Django 6.1](https://img.shields.io/badge/Django_6.1-092E20?style=for-the-badge&logo=django&logoColor=white) ![Django REST Framework](https://img.shields.io/badge/Django_REST_Framework-A30000?style=for-the-badge&logo=django&logoColor=white) ![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white) |
+| **Database** | ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL_16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white) |
+| **Frontend** | ![React 19](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white) |
+| **Infrastructure** | ![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![nginx](https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white) ![Let's Encrypt](https://img.shields.io/badge/Let%27s_Encrypt-003A70?style=for-the-badge&logo=letsencrypt&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white) |
+
+---
+
 ## Run it
 
 One command, from a clean checkout:
@@ -174,8 +185,3 @@ assumed.
 The suite was also mutation-tested: three defects were introduced deliberately
 to check the tests noticed. Two were caught; the third exposed a real gap in the
 fixtures, which is documented in [FINDINGS.md](FINDINGS.md#8-the-test-suite-and-proof-that-it-can-fail).
-
-## Stack
-
-Django 6.1 · DRF · PostgreSQL 16 · numpy · React 19 · TypeScript · Vite ·
-Docker Compose · nginx · Let's Encrypt · GitHub Actions
