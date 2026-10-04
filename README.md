@@ -2,18 +2,18 @@
 
 [![CI](https://github.com/Haseeb-Akhlaq/brainvar-explorer/actions/workflows/ci.yml/badge.svg)](https://github.com/Haseeb-Akhlaq/brainvar-explorer/actions/workflows/ci.yml)
 
-**Live: [brainvar.haseebakhlaq.com](https://brainvar.haseebakhlaq.com)** · [API](https://api.brainvar.haseebakhlaq.com/api/genes/SCN2A/) · [Interactive API reference](https://api.brainvar.haseebakhlaq.com/api/docs/)
-
-A web application replacing `per_gene_cpm_brainvar.py`, a legacy analysis
-script. Type a gene symbol and see how its expression changes across human
-brain development — 176 BrainVar RNA-seq samples spanning 6 post-conception
-weeks to adulthood, LOESS-smoothed with a 95% confidence band, annotated with
-the developmental periods P1–P12.
+A web app for exploring how genes behave as the human brain grows. Type the
+name of a gene and it draws a chart of how active that gene is at each stage of
+life, from a few weeks after conception through to adulthood. The chart is
+built from measurements of 176 brain tissue samples, with a smooth line showing
+the overall trend.
 
 ![The application showing SCN2A](docs/screenshot.jpg)
 
-The original script took **12 seconds** per gene, re-parsing a 98 MB matrix on
-every run, and wrote a PDF to a hardcoded path. The API answers in **~26 ms**.
+It began as a replacement for a legacy analysis script,
+`per_gene_cpm_brainvar.py`, which took **12 seconds** per gene, re-parsing a
+98 MB matrix on every run, and wrote a PDF to a hardcoded path. The API answers
+in **~26 ms**.
 
 ---
 
